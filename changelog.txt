@@ -1,5 +1,6 @@
 v12.0.30~dev
 - Add 'extrafanart' to Kodi database as 'fanart#'
+- Add a plugin path for skins that allows these to be passed to a 'multiimage' control
 
 v12.0.29
 - Update to fanart.tv API v3

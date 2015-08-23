@@ -22,13 +22,14 @@ import xbmc
 import sys
 
 ### import libraries
+from lib import common
 from lib.language import *
 from lib.script_exceptions import NoFanartError
 from lib.utils import *
 from operator import itemgetter
 
 ### get addon info
-__localize__    = ( sys.modules[ "__main__" ].__localize__ )
+__localize__ = common.__localize__
 
 API_KEY = '4be68d7eab1fbd1b6fd8a3b80a65a95e'
 API_CFG = 'http://api.themoviedb.org/3/configuration?api_key=%s'

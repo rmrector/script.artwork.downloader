@@ -23,6 +23,7 @@ import sys
 #import libraries
 import xml.etree.ElementTree as ET
 from operator import itemgetter
+from lib import common
 from lib.language import *
 from lib.script_exceptions import NoFanartError
 from lib.utils import *
@@ -30,7 +31,7 @@ from lib.utils import *
 API_URL = 'http://www.thetvdb.com/api/%s/series/%s/banners.xml'
 
 ### get addon info
-__localize__    = ( sys.modules[ "__main__" ].__localize__ )
+__localize__ = common.__localize__
 
 class TVDBProvider():
     """

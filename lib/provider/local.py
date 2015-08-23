@@ -25,6 +25,7 @@ import xbmcvfs
 
 ### import libraries
 #from resources.lib.provider.base import BaseProvider
+from lib import common
 from lib.art_list import arttype_list
 from lib.script_exceptions import NoFanartError
 from lib.settings import get_limit, get as get_settings
@@ -32,7 +33,7 @@ from lib.utils import *
 from operator import itemgetter
 
 ### get addon info
-__localize__    = ( sys.modules[ "__main__" ].__localize__ )
+__localize__ = common.__localize__
 arttype_list = arttype_list()
 limit = get_limit()
 settings = get_settings()
