@@ -23,6 +23,7 @@ import socket
 import xbmc
 import xbmcgui
 import unicodedata
+import urllib
 import urllib2
 import sys
 
@@ -198,3 +199,10 @@ def save_nfo_file(data, target):
     except Exception, e:
         log(str(e), xbmc.LOGERROR)
         return False
+
+def unquoteimage(imagestring):
+    if imagestring.startswith('image://'):
+        return urllib.unquote(imagestring[8:-1])
+    else:
+        return imagestring
+

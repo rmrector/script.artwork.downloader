@@ -558,11 +558,19 @@ class Main:
                                     imagefound = True
                                 else:
                                     artcheck = item['art']
-                                    # Check if extrathumbs/extrafanart image already exist local
-                                    if art_item['art_type'] in ['extrathumbs','extrafanart']:
+                                    # Check if extrathumbs image already exist local
+                                    if art_item['art_type'] == 'extrathumbs':
                                         for targetdir in item['targetdirs']:
                                             if not self.fileops._exists(os.path.join(targetdir, item['filename'])):
                                                 missingfiles = True
+                                    elif art_item['art_type'] == 'extrafanart':
+                                        # check extra fanart in the DB
+                                        dburl = item['url'] if not setting['files_local'] else item['localfilename']
+                                        exists = next((True for url in item['art'].values() if dburl == unquoteimage(url)), False)
+                                        missingfiles = not exists
+                                        if (setting['files_local'] or setting['classic_extrafanart']) and not self.fileops._exists(item['localfilename']):
+                                            # and file system
+                                            missingfiles = True
                                     # Check if image already exist in database
                                     elif not art_item['art_type'] in ['seasonlandscape','seasonbanner','seasonposter']:
                                         if setting['files_local']and not self.fileops._exists(item['localfilename']):
