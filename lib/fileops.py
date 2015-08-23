@@ -146,11 +146,14 @@ class fileops:
         else:
             log("[%s] Downloaded: %s" % (item['media_name'], item['filename']))
             self.downloadcount += 1
+            filenames = []
             for targetdir in item['targetdirs']:
                 #targetpath = os.path.join(urllib.url2pathname(targetdir).replace('|',':'), filename)
                 targetpath = os.path.join(targetdir, item['filename'])
                 self._copyfile(temppath, targetpath, item['media_name'])
-                
+                filenames.append(targetpath)
+            return filenames
+
 def cleanup():
     if xbmcvfs.exists(tempdir):
         dialog_msg('update', percentage = 100, line1 = __localize__(32005), background =  __addon__.getSetting('background'))

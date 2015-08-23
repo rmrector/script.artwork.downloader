@@ -161,15 +161,15 @@ msgid "Overwrite all existing artwork [I](will be automaticly disabled after dow
 msgstr ""
 
 msgctxt "#32036"
-msgid "Centralize extrafanart [I](Can be used for extrafanart slideshow) [/I]"
+msgid "Centralize extra fanart [I](Can be used for extra fanart slideshow) [/I]"
 msgstr ""
 
 msgctxt "#32037"
-msgid "Central TV extrafanart directory"
+msgid "Central TV extra fanart directory"
 msgstr ""
 
 msgctxt "#32038"
-msgid "Central Movie extrafanart directory"
+msgid "Central Movie extra fanart directory"
 msgstr ""
 
 msgctxt "#32039"
@@ -192,7 +192,7 @@ msgid "[B]Options for limiting downloaded artwork[/B]"
 msgstr ""
 
 msgctxt "#32053"
-msgid "Maximum extrafanart"
+msgid "Maximum extra fanart"
 msgstr ""
 
 msgctxt "#32054"
@@ -277,7 +277,11 @@ msgctxt "#32103"
 msgid "Use local files"
 msgstr ""
 
-#empty strings from id 32104 to 32105
+msgctxt "#32104"
+msgid "Copy extra fanart to folder [I](for skins using classic extrafanart)[/I]"
+msgstr ""
+
+#empty string 32105
 
 msgctxt "#32106"
 msgid "Use XBMC pre-caching [I](caches images to thumbnails folder while downloading) [/I]"
@@ -291,7 +295,7 @@ msgid "Fanart"
 msgstr ""
 
 msgctxt "#32122"
-msgid "Extrafanart"
+msgid "Extra Fanart [I](multiple images)[/I]"
 msgstr ""
 
 msgctxt "#32123"
@@ -323,11 +327,11 @@ msgid "Season Posters"
 msgstr ""
 
 msgctxt "#32130"
-msgid "Thumb 16:9"
+msgid "Landscape"
 msgstr ""
 
 msgctxt "#32131"
-msgid "Extrathumbs"
+msgid "Thumbnails [I](multiple images)[/I]"
 msgstr ""
 
 msgctxt "#32132"
@@ -339,7 +343,7 @@ msgid "Artwork"
 msgstr ""
 
 msgctxt "#32134"
-msgid "Season Thumbs 16:9"
+msgid "Season Landscape"
 msgstr ""
 
 #empty strings from id 32135 to 32140

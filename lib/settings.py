@@ -34,6 +34,7 @@ def get():
                'xmlfailthreshold':         5,     # Abbort when this many fails
                'api_timedelay':            5000,  # in msec
 
+               'classic_extrafanart': __addon__.getSetting('classic_extrafanart') == 'true',
                'centralize_enable':        __addon__.getSetting("centralize_enable")      == 'true',
                'centralfolder_movies':     __addon__.getSetting("centralfolder_movies"),
                'centralfolder_tvshows':    __addon__.getSetting("centralfolder_tvshows"),

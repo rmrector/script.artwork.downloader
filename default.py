@@ -616,6 +616,7 @@ class Main:
         global download_succes
         global reportdata
         image_list_total = len(image_list)
+        extrafanart_count = 0
         if not image_list_total == 0:
             failcount = 0
             for item in image_list:
@@ -640,7 +641,17 @@ class Main:
                             item['url'].startswith('http')):
                             self.fileops._downloadfile(item)
                         item['url'] = item['localfilename'].replace('\\','\\\\')
-                    if item['art_type'] in ['extrathumbs', 'extrafanart']:
+
+                    if item['art_type'] == 'extrafanart':
+                        if setting['classic_extrafanart'] or setting['files_local']:
+                            targetfiles = self.fileops._downloadfile(item)
+                            if setting['files_local']:
+                                item['url'] = targetfiles[0].replace('\\', '\\\\')
+
+                        extrafanart_count += 1
+                        item['art_type'] = 'fanart%s' % extrafanart_count
+
+                    if item['art_type'] == 'extrathumbs':
                         self.fileops._downloadfile(item)
                     elif item['mediatype'] == 'movie':
                         xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.SetMovieDetails", "params": { "movieid": %i, "art": { "%s": "%s" }}, "id": 1 }' %(item['dbid'], item['art_type'], item['url']))

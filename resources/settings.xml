@@ -92,6 +92,7 @@
         <setting type="sep" />
         <setting label="32035" type="bool"      id="files_overwrite"            default="false"/>
         <setting label="32103" type="bool"      id="files_local"                default="false"/>
+        <setting label="32104" type="bool" id="classic_extrafanart" default="true" />
         <setting type="sep" />
         <setting label="32036" type="bool"      id="centralize_enable"          default="false"/>
         <setting label="32038" type="folder"    id="centralfolder_movies"       default=""      subsetting="true"    source="auto" option="writeable" enable="eq(-1,true)" visible="eq(-1,true)"/>

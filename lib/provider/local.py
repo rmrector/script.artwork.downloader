@@ -27,7 +27,7 @@ import xbmcvfs
 #from resources.lib.provider.base import BaseProvider
 from lib.art_list import arttype_list
 from lib.script_exceptions import NoFanartError
-from lib.settings import get_limit
+from lib.settings import get_limit, get as get_settings
 from lib.utils import *
 from operator import itemgetter
 
@@ -35,12 +35,13 @@ from operator import itemgetter
 __localize__    = ( sys.modules[ "__main__" ].__localize__ )
 arttype_list = arttype_list()
 limit = get_limit()
+settings = get_settings()
 
 class local():
     def get_image_list(self,media_item):
         image_list = []
         missing =[]
-        file_list = xbmcvfs.listdir(media_item['artworkdir'][0])
+        dir_list, file_list = xbmcvfs.listdir(media_item['artworkdir'][0])
         ### Processes the bulk mode downloading of files
         i = 0 # needed
         j = 0 # have
@@ -50,19 +51,16 @@ class local():
                 i += 1
                 # File checking
                 if item['art_type'] == 'extrafanart':
-                    extrafanart_file_list = ''
-                    if 'extrafanart' in file_list[0]:
-                        extrafanart_file_list = xbmcvfs.listdir(media_item['extrafanartdirs'][0])
-                        #log('list of extrafanart files: %s'%extrafanart_file_list[1])
-                        #log('extrafanart found: %s'%len(extrafanart_file_list[1]))
-                        if len(extrafanart_file_list[1]) >= limit.get('limit_extrafanart_max'):
+                    if 'extrafanart' in dir_list:
+                        _, extrafanart_file_list = xbmcvfs.listdir(media_item['extrafanartdirs'][0])
+                        if len(extrafanart_file_list) >= limit.get('limit_extrafanart_max'):
                             j += 1
                         else:
                             missing.append(item['art_type'])
 
                 elif item['art_type'] == 'extrathumbs':
                     extrathumbs_file_list = ''
-                    if 'extrathumbs' in file_list[0]:
+                    if 'extrathumbs' in dir_list:
                         extrathumbs_file_list = xbmcvfs.listdir(media_item['extrathumbsdirs'][0])
                         #log('list of extrathumbs files: %s'%extrathumbs_file_list[1])
                         #log('extrathumbs found: %s'%len(extrathumbs_file_list[1]))
@@ -80,7 +78,7 @@ class local():
                         else:
                             filename = (item['filename'] % int(season))
                         #log ('finding: %s'%filename)
-                        if filename in file_list[1]:
+                        if filename in file_list:
                             url = os.path.join(media_item['artworkdir'][0], filename).encode('utf-8')
                             j += 1
                             generalinfo = '%s: %s  |  ' %( __localize__(32141), 'n/a')
@@ -110,7 +108,7 @@ class local():
                         else:
                             filename = (item['filename'] % int(season))
                         #log ('finding: %s'%filename)
-                        if filename in file_list[1]:
+                        if filename in file_list:
                             url = os.path.join(media_item['artworkdir'][0], filename).encode('utf-8')
                             j += 1
                             generalinfo = '%s: %s  |  ' %( __localize__(32141), 'n/a')
@@ -137,8 +135,8 @@ class local():
                             filename = "season-all-landscape.jpg"
                         else:
                             filename = (item['filename'] % int(season))
-                        #log ('finding: %s'%filename) 
-                        if filename in file_list[1]:
+                        #log ('finding: %s'%filename)
+                        if filename in file_list:
                             url = os.path.join(media_item['artworkdir'][0], filename).encode('utf-8')
                             j += 1
                             generalinfo = '%s: %s  |  ' %( __localize__(32141), 'n/a')
@@ -162,7 +160,7 @@ class local():
                 else:
                     filename = item['filename']
                     #log ('finding: %s'%filename)
-                    if filename in file_list[1]:
+                    if filename in file_list:
                         url = os.path.join(media_item['artworkdir'][0], filename).encode('utf-8')
                         j += 1
                         generalinfo = '%s: %s  |  ' %( __localize__(32141), 'n/a')

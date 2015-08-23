@@ -1,3 +1,6 @@
+v12.0.30~dev
+- Add 'extrafanart' to Kodi database as 'fanart#'
+
 v12.0.29
 - Update to fanart.tv API v3
 
