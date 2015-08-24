@@ -180,7 +180,15 @@ msgctxt "#32040"
 msgid "-"
 msgstr ""
 
-#empty strings from id 32041 to 32050
+msgctxt "#32041"
+msgid "Actions"
+msgstr ""
+
+msgctxt "#32042"
+msgid "Ensure classic extrafanart is in library"
+msgstr ""
+
+#empty strings from id 32043 to 32050
 #Add-on settings: Limit section id=32051 to 32060
 
 msgctxt "#32051"
@@ -401,7 +409,19 @@ msgctxt "#32153"
 msgid "add-on cancelled while downloading Artwork"
 msgstr ""
 
-#empty strings from id 32154 to 32180
+msgctxt "#32154"
+msgid "Add extrafanart to library"
+msgstr ""
+
+msgctxt "#32155"
+msgid "You should only need to run this on a library once, new fanart will be added to the library automatically."
+msgstr ""
+
+msgctxt "#32156"
+msgid "No items found in any video libraries."
+msgstr ""
+
+#empty strings from id 32157 to 32180
 #Add-on settings: Info section id=32181 to 32190
 
 msgctxt "#32181"

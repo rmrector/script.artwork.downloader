@@ -87,7 +87,7 @@ def get():
 
 def get_limit():
     setting = {'limit_artwork':            __addon__.getSetting("limit_artwork")          == "true",
-               'limit_extrafanart_max':    (float(__addon__.getSetting("limit_extrafanart_maximum"))),
+               'limit_extrafanart_max':    int(__addon__.getSetting("limit_extrafanart_maximum")),
                'limit_extrafanart_rating': int(float(__addon__.getSetting("limit_extrafanart_rating"))),
                'limit_size_moviefanart':   int(__addon__.getSetting("limit_size_moviefanart")),
                'limit_size_tvshowfanart':  int(__addon__.getSetting("limit_size_tvshowfanart")),
