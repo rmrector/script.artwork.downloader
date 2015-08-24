@@ -59,6 +59,26 @@ class local():
                         else:
                             missing.append(item['art_type'])
 
+                        generalinfo = '%s: %s  |  ' % (__localize__(32141), 'n/a')
+                        generalinfo += '%s: %s  |  ' % (__localize__(32143), 'n/a')
+                        generalinfo += '%s: %s  |  ' % (__localize__(32145), 'n/a')
+                        for filename in extrafanart_file_list:
+                            url = os.path.join(media_item['extrafanartdirs'][0], filename).encode('utf-8')
+                            rlog(url)
+                            item = {
+                                'url': url,
+                                'preview': url,
+                                'id': filename.rsplit('.', 1)[0],
+                                'art_type': [item['art_type']],
+                                'size': '0',
+                                'season': 'n/a',
+                                'language': 'EN',
+                                'votes': '0',
+                                'generalinfo': generalinfo,
+                                'rating': 5
+                            }
+                            image_list.append(item)
+
                 elif item['art_type'] == 'extrathumbs':
                     extrathumbs_file_list = ''
                     if 'extrathumbs' in dir_list:

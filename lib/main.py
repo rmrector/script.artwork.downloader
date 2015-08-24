@@ -653,9 +653,10 @@ class Main:
 
                     if item['art_type'] == 'extrafanart':
                         if setting['classic_extrafanart'] or setting['files_local']:
-                            targetfiles = self.fileops._downloadfile(item)
-                            if setting['files_local']:
-                                item['url'] = targetfiles[0].replace('\\', '\\\\')
+                            if not self.fileops._exists(item['localfilename']) and item['url'].startswith('http'):
+                                targetfiles = self.fileops._downloadfile(item)
+                                if targetfiles and setting['files_local']:
+                                    item['url'] = targetfiles[0].replace('\\', '\\\\')
 
                         extrafanart_count += 1
                         item['art_type'] = 'fanart%s' % extrafanart_count
