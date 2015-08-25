@@ -1,5 +1,4 @@
 import os
-import time
 import xbmc
 import xbmcgui
 import xbmcvfs
@@ -26,7 +25,6 @@ messages = {
 }
 
 def classic_extrafanart_tolibrary():
-    start = time.clock()
     progress = xbmcgui.DialogProgress()
     progress.create(messages['title'])
     progress.update(0, messages['processing'])
@@ -76,8 +74,7 @@ def classic_extrafanart_tolibrary():
                 canceled = True
                 break
 
-    process_time = int(time.clock() - start)
-    message = "Took %s seconds to scan %s media, and added %s extra fanart to the library.[CR]%s" % (process_time, checkedcount, extrafanart_added, messages['upgradeonce'])
+    message = "Scanned %s media and added %s extra fanart to the library.[CR]%s" % (checkedcount, extrafanart_added, messages['upgradeonce'])
     progress.close()
 
     xbmcgui.Dialog().ok("%s: %s" % (messages['canceled'] if canceled else messages['finished'], messages['title']), message)
