@@ -102,11 +102,11 @@ def _add_extrafanart_tolibrary(itemtype, item, max_fanart):
     if not newfanart:
         return 0
 
-    dbfanart_count = len(dbfanart)
+    dbfanart_start = max(len(dbfanart), 1)
     newfanartdict = {}
-    maxaddindex = min(max_fanart - dbfanart_count, len(newfanart) - 1)
+    maxaddindex = min(max_fanart - dbfanart_start, len(newfanart) - 1)
     for newfanart_index in range(maxaddindex):
-        newfanartdict['fanart%s' % (dbfanart_count + newfanart_index)] = newfanart[newfanart_index]
+        newfanartdict['fanart%s' % (dbfanart_start + newfanart_index)] = newfanart[newfanart_index]
 
     if itemtype == 'movie':
         id_param = 'movieid'
