@@ -625,7 +625,8 @@ class Main:
         global download_succes
         global reportdata
         image_list_total = len(image_list)
-        extrafanart_count = 0
+        # big ugly dict of mediatype, dbid tuples
+        extrafanart_counts = {}
         if not image_list_total == 0:
             failcount = 0
             for item in image_list:
@@ -657,9 +658,12 @@ class Main:
                                 targetfiles = self.fileops._downloadfile(item)
                                 if targetfiles and setting['files_local']:
                                     item['url'] = targetfiles[0].replace('\\', '\\\\')
-
-                        extrafanart_count += 1
-                        item['art_type'] = 'fanart%s' % extrafanart_count
+                        itemtpl = (item['mediatype'], item['dbid'])
+                        if itemtpl in extrafanart_counts:
+                            extrafanart_counts[itemtpl] += 1
+                        else:
+                            extrafanart_counts[itemtpl] = 1
+                        item['art_type'] = 'fanart%s' % extrafanart_counts[itemtpl]
 
                     if item['art_type'] == 'extrathumbs':
                         self.fileops._downloadfile(item)
