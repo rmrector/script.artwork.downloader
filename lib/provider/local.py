@@ -64,7 +64,6 @@ class local():
                         generalinfo += '%s: %s  |  ' % (__localize__(32145), 'n/a')
                         for filename in extrafanart_file_list:
                             url = os.path.join(media_item['extrafanartdirs'][0], filename).encode('utf-8')
-                            rlog(url)
                             item = {
                                 'url': url,
                                 'preview': url,
