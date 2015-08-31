@@ -30,14 +30,29 @@ else:
     import json as simplejson
 
 ### import libraries
-from lib.utils import log
+import quickjson
+from utils import log
 
 ### get datalist from the unique media item
 # Retrieve JSON list
 def _media_unique(media_type, dbid):
     log('Using JSON for retrieving %s info' %media_type)
     Medialist = []
-    if media_type == 'tvshow':
+    if media_type == 'episode':
+        json_request = quickjson.get_baserequest("VideoLibrary.GetEpisodeDetails")
+        json_request['params']['properties'] = ['file', 'uniqueid', 'art']
+        json_request['params']['episodeid'] = int(dbid)
+        json_result = quickjson.execute_jsonrpc(json_request)
+
+        if 'result' in json_result and 'episodedetails' in json_result['result']:
+            item = json_result['result']['episodedetails']
+            if 'unknown' in item['uniqueid']:
+                itemid = item['uniqueid']['unknown']
+            else:
+                itemid = item['uniqueid'].values()[0] if item['uniqueid'] else ''
+                log("Picked first item '%s' from '%s'" % (itemid, item['uniqueid']), xbmc.LOGNOTICE)
+            Medialist.append({'dbid': item['episodeid'], 'id': itemid, 'name': item['label'], 'file': item['file'], 'path': media_path(item['file']), 'art': item['art'], 'mediatype': media_type})
+    elif media_type == 'tvshow':
         json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetTVShowDetails", "params": {"properties": ["file", "imdbnumber", "art"], "tvshowid":%s}, "id": 1}' %dbid)
         json_query = unicode(json_query, 'utf-8', errors='ignore')
         jsonobject = simplejson.loads(json_query)
@@ -55,7 +70,7 @@ def _media_unique(media_type, dbid):
             if jsonobject_season['result'].has_key('seasons'):
                 seasons = jsonobject_season['result']['seasons']
                 for season in seasons:
-                    seasons_list.append(season.get('season')) 
+                    seasons_list.append(season.get('season'))
             Medialist.append({'id': item.get('imdbnumber',''),
                               'dbid': item.get('tvshowid',''),
                               'name': item.get('label',''),
@@ -108,10 +123,25 @@ def _media_unique(media_type, dbid):
             log('No JSON results found')
     return Medialist
 
-def _media_listing(media_type):
+def _media_listing(media_type, dbid=None):
     log('Using JSON for retrieving %s info' %media_type)
     Medialist = []
-    if media_type == 'tvshow':
+    if media_type == 'episode':
+        if not dbid:
+            return []
+        json_request = quickjson.get_baserequest("VideoLibrary.GetEpisodes")
+        json_request['params']['properties'] = ['file', 'uniqueid', 'art']
+        json_request['params']['tvshowid'] = int(dbid)
+        json_result = quickjson.execute_jsonrpc(json_request)
+        if 'result' in json_result and 'episodes' in json_result['result']:
+            for item in json_result['result']['episodes']:
+                if 'unknown' in item['uniqueid']:
+                    itemid = item['uniqueid']['unknown']
+                else:
+                    itemid = item['uniqueid'].values()[0] if item['uniqueid'] else ''
+                    log("Picked first item '%s' from '%s'" % (itemid, item['uniqueid']), xbmc.LOGNOTICE)
+                Medialist.append({'dbid': item['episodeid'], 'id': itemid, 'name': item['label'], 'file': item['file'], 'path': media_path(item['file']), 'art': item['art'], 'mediatype': media_type})
+    elif media_type == 'tvshow':
         json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetTVShows", "params": {"properties": ["file", "imdbnumber", "art"], "sort": { "method": "label" } }, "id": 1}')
         json_query = unicode(json_query, 'utf-8', errors='ignore')
         jsonobject = simplejson.loads(json_query)
@@ -128,7 +158,7 @@ def _media_listing(media_type):
                 if jsonobject_season['result'].has_key('seasons'):
                     seasons = jsonobject_season['result']['seasons']
                     for season in seasons:
-                        seasons_list.append(season.get('season')) 
+                        seasons_list.append(season.get('season'))
                 Medialist.append({'id': item.get('imdbnumber',''),
                                   'dbid': item.get('tvshowid',''),
                                   'name': item.get('label',''),

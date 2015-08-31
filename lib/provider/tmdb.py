@@ -19,7 +19,7 @@
 
 #import modules
 import xbmc
-import sys
+import xml.etree.ElementTree as ET
 
 ### import libraries
 from lib import common
@@ -34,6 +34,58 @@ __localize__ = common.__localize__
 API_KEY = '4be68d7eab1fbd1b6fd8a3b80a65a95e'
 API_CFG = 'http://api.themoviedb.org/3/configuration?api_key=%s'
 API_URL = 'http://api.themoviedb.org/3/movie/%s/images?api_key=%s'
+
+class TMDBEpisodeProvider():
+    def __init__(self):
+        self.name = "TMDB Episode"
+
+    def get_image_list(self, media_id):
+        # media_id is TheTVDB episode ID
+        url = 'http://api.themoviedb.org/3/find/%s?external_source=tvdb_id&api_key=%s' % (media_id, API_KEY)
+        data = get_data(url)
+        if data['tv_episode_results']:
+            data = data['tv_episode_results'][0]
+            data = get_data('http://api.themoviedb.org/3/tv/%s/season/%s/episode/%s/images?api_key=%s' % (data['show_id'], data['season_number'], data['episode_number'], API_KEY))
+            api_cfg = get_data(API_CFG%(API_KEY), 'json')
+            if api_cfg == "Empty" or not api_cfg:
+                return []
+
+            baseurl = api_cfg['images']['base_url']
+
+            image_list = []
+            for item in data['stills']:
+                if int(item.get('vote_count')) > 0:
+                    rating = float( "%.1f" % float( item.get('vote_average'))) #output string with one decimal
+                    votes = item.get('vote_count','n/a')
+                else:
+                    rating = 5
+                    votes = 0
+                # Fill list
+                image_list.append({'url': baseurl + 'original' + item['file_path'],
+                                   'preview': baseurl + 'w300' + item['file_path'],
+                                   'id': item.get('file_path').lstrip('/').replace('.jpg', ''),
+                                   'art_type': ['fanart'],
+                                   'height': item.get('height'),
+                                   'width': item.get('width'),
+                                   'language': item.get('iso_639_1','n/a'),
+                                   'rating': rating,
+                                   'votes': votes,
+                                   # Create Gui string to display
+                                   'generalinfo': ('%s: %s  |  %s: %s  |  %s: %s  |  %s: %sx%s  |  '
+                                                   %( __localize__(32141), get_language(item.get('iso_639_1','n/a')).capitalize(),
+                                                      __localize__(32142), rating if votes else 'n/a',
+                                                      __localize__(32143), votes,
+                                                      __localize__(32145), item.get('width'), item.get('height')))})
+            if not image_list:
+                raise NoFanartError(media_id)
+            else:
+                # Sort the list before return. Last sort method is primary
+                image_list = sorted(image_list, key=itemgetter('rating'), reverse=True)
+                image_list = sorted(image_list, key=itemgetter('language'))
+                return image_list
+        else:
+            # tmdb doesn't have tvdb_id for this episode
+            return []
 
 class TMDBProvider():
 
@@ -69,7 +121,7 @@ class TMDBProvider():
                                        'rating': rating,
                                        'votes': votes,
                                        # Create Gui string to display
-                                       'generalinfo': ('%s: %s  |  %s: %s  |  %s: %s  |  %s: %sx%s  |  ' 
+                                       'generalinfo': ('%s: %s  |  %s: %s  |  %s: %s  |  %s: %sx%s  |  '
                                                        %( __localize__(32141), get_language(item.get('iso_639_1','n/a')).capitalize(),
                                                           __localize__(32142), rating,
                                                           __localize__(32143), votes,
@@ -96,7 +148,7 @@ class TMDBProvider():
                                        'rating': rating,
                                        'votes': votes,
                                        # Create Gui string to display
-                                       'generalinfo': ('%s: %s  |  %s: %s  |  %s: %s  |  %s: %sx%s  |  ' 
+                                       'generalinfo': ('%s: %s  |  %s: %s  |  %s: %s  |  %s: %sx%s  |  '
                                                        %( __localize__(32141), get_language(item.get('iso_639_1','n/a')).capitalize(),
                                                           __localize__(32142), rating,
                                                           __localize__(32143), votes,
@@ -123,7 +175,7 @@ class TMDBProvider():
                                        'rating': rating,
                                        'votes': votes,
                                        # Create Gui string to display
-                                       'generalinfo': ('%s: %s  |  %s: %s  |  %s: %s  |  %s: %sx%s  |  ' 
+                                       'generalinfo': ('%s: %s  |  %s: %s  |  %s: %s  |  %s: %sx%s  |  '
                                                        %( __localize__(32141), get_language(item.get('iso_639_1','n/a')).capitalize(),
                                                           __localize__(32142), rating,
                                                           __localize__(32143), votes,

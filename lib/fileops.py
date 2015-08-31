@@ -64,9 +64,9 @@ class fileops:
                     raise CreateDirectoryError(__addonprofile__)
             if not self._mkdir(tempdir):
                 raise CreateDirectoryError(tempdir)
-        
+
     def _copy(self, source, target):
-        return xbmcvfs.copy(source.encode("utf-8"), target.encode("utf-8"))
+        return xbmcvfs.copy(source, target)
 
     ### Delete file from all targetdirs
     def _delete_file_in_dirs(self, filename, targetdirs, reason, media_name = '' ):
@@ -82,7 +82,7 @@ class fileops:
 
     ### erase old cache file and copy new one
     def erase_current_cache(self,filename):
-        try: 
+        try:
             cached_thumb = self.get_cached_thumb(filename)
             log( "Cache file %s" % cached_thumb )
             if xbmcvfs.exists( cached_thumb.replace("png" , "dds").replace("jpg" , "dds") ):
@@ -108,9 +108,9 @@ class fileops:
             if ".jpg" in filename:
                 cachedthumb = cachedthumb.replace("tbn" ,"jpg")
             elif ".png" in filename:
-                cachedthumb = cachedthumb.replace("tbn" ,"png")      
-            thumbpath = os.path.join( THUMBS_CACHE_PATH, cachedthumb[0], cachedthumb ).replace( "/Video" , "")    
-        return thumbpath         
+                cachedthumb = cachedthumb.replace("tbn" ,"png")
+            thumbpath = os.path.join( THUMBS_CACHE_PATH, cachedthumb[0], cachedthumb ).replace( "/Video" , "")
+        return thumbpath
 
     # copy file from temp to final location
     def _copyfile(self, sourcepath, targetpath, media_name = ''):
@@ -126,7 +126,7 @@ class fileops:
     # download file
     def _downloadfile(self, item, mode = ""):
         try:
-            temppath = os.path.join(tempdir, item['filename'])
+            temppath = os.path.join(tempdir, item['filename'].decode('utf-8'))
             tempfile = open(temppath, "wb")
             response = urllib2.urlopen(item['url'])
             tempfile.write(response.read())
@@ -135,6 +135,9 @@ class fileops:
         except HTTPError, e:
             if e.code == 404:
                 raise HTTP404Error(item['url'])
+            elif e.code == 429:
+                xbmc.sleep(2000)
+                return self._downloadfile(item, mode)
             else:
                 raise DownloadError(str(e))
         except URLError:
@@ -150,7 +153,7 @@ class fileops:
             for targetdir in item['targetdirs']:
                 #targetpath = os.path.join(urllib.url2pathname(targetdir).replace('|',':'), filename)
                 targetpath = os.path.join(targetdir, item['filename'])
-                self._copyfile(temppath, targetpath, item['media_name'])
+                self._copyfile(temppath.encode('utf-8'), targetpath, item['media_name'])
                 filenames.append(targetpath)
             return filenames
 

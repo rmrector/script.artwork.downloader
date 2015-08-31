@@ -19,6 +19,7 @@
 
 #import modules
 import lib.common
+import os
 import socket
 import xbmc
 import xbmcgui
@@ -101,11 +102,6 @@ def dialog_msg(action,
                nolabel = __localize__(32026),
                yeslabel = __localize__(32025),
                cancelled = False):
-    # Fix possible unicode errors 
-    line0 = line0.encode( 'utf-8', 'ignore' )
-    line1 = line1.encode( 'utf-8', 'ignore' )
-    line2 = line2.encode( 'utf-8', 'ignore' )
-    line3 = line3.encode( 'utf-8', 'ignore' )
 
     # Dialog logic
     if not line0 == '':
@@ -143,7 +139,7 @@ def get_data(url, data_type ='json'):
     if CACHE_ON:
         result = cache.cacheFunction(get_data_new, url, data_type)
     else:
-        result = get_data_new(url, data_type)    
+        result = get_data_new(url, data_type)
     if not result:
         result = 'Empty'
     return result
@@ -172,6 +168,10 @@ def get_data_new(url, data_type):
             raise HTTP404Error(url)
         elif e.code == 503:
             raise HTTP503Error(url)
+        elif e.code == 429:
+            # Too many requests.
+            xbmc.sleep(2000)
+            return get_data_new(url, data_type)
         else:
             raise DownloadError(str(e))
     except URLError:
@@ -206,3 +206,5 @@ def unquoteimage(imagestring):
     else:
         return imagestring
 
+def basename(path):
+    return os.path.splitext(os.path.basename(path))[0]

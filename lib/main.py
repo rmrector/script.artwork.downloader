@@ -37,7 +37,6 @@ __version__      = common.__version__
 ### import libraries
 import language
 import provider
-import listbuilder
 from apply_filters import filter
 from art_list import arttype_list
 from fileops import fileops, cleanup
@@ -50,8 +49,6 @@ from report import create_report
 from script_exceptions import *
 from settings import get_limit, get, check
 from utils import *
-from traceback import print_exc
-from urlparse import urlsplit
 from xml.parsers.expat import ExpatError
 
 arttype_list = arttype_list()
@@ -98,9 +95,15 @@ class Main:
                     if startup['mediatype'] == 'movie':
                         self.download_artwork(mediaList, providers['movie_providers'])
                     elif startup['mediatype'] == 'tvshow':
-                        self.download_artwork(mediaList, providers['tv_providers'])
+                        if 'episode.fanart' in sys.argv:
+                            mediaList = media_listing('episode', startup['dbid'])
+                            self.download_artwork(mediaList, providers['episode_providers'])
+                        else:
+                            self.download_artwork(mediaList, providers['tv_providers'])
                     elif startup['mediatype'] == 'musicvideo':
                         self.download_artwork(mediaList, providers['musicvideo_providers'])
+                    elif startup['mediatype'] == 'episode':
+                        self.download_artwork(mediaList, providers['episode_providers'])
                     if (not dialog_msg('iscanceled', background = setting['background']) and not
                         (startup['mode'] == 'customgui' or
                         startup['mode'] == 'gui')):
@@ -169,8 +172,8 @@ class Main:
             if arg[0] in args:
                 j = arg[1]
                 startup.update({arg[0]:arg[1]})
-        if startup['mediatype'] and (startup['mediatype'] not in ['tvshow', 'movie', 'musicvideo']):
-            log('Error: invalid mediatype, must be one of movie, tvshow or musicvideo', xbmc.LOGERROR)
+        if startup['mediatype'] and (startup['mediatype'] not in ['tvshow', 'movie', 'musicvideo', 'episode']):
+            log('Error: invalid mediatype, must be one of movie, tvshow, musicvideo, or episodenumber', xbmc.LOGERROR)
             return False
         elif startup['dbid'] == '':
             dialog_msg('okdialog',
@@ -279,8 +282,7 @@ class Main:
             log('########################################################')
             log('Processing media:  %s' % currentmedia['name'])
             # do some id conversions
-            if (not currentmedia['mediatype'] == 'tvshow' and
-                currentmedia['id'] in ['','tt0000000','0']):
+            if currentmedia['mediatype'] not in ('tvshow', 'episode') and currentmedia['id'] in ('', 'tt0000000', '0'):
                 log('No IMDB ID found, trying to search themoviedb.org for matching title.')
                 currentmedia['id'] = tmdb._search_movie(currentmedia['name'],currentmedia['year'])
             elif (currentmedia['mediatype'] == 'movie' and not
@@ -510,10 +512,12 @@ class Main:
                                 item['filename'] = "season-all-landscape.jpg"
                             else:
                                 item['filename'] = (art_item['filename'] % int(artwork['season']))
+                        elif item['mediatype'] == 'episode' and art_item['art_type'] == 'fanart':
+                            item['filename'] = '%s-fanart.jpg' % basename(currentmedia['file'])
                         else:
                             item['filename'] = art_item['filename']
                         for targetdir in item['targetdirs']:
-                            item['localfilename'] = os.path.join(targetdir, item['filename']).encode('utf-8')
+                            item['localfilename'] = os.path.join(targetdir, item['filename'])
                             break
 
                         # Continue
@@ -671,6 +675,8 @@ class Main:
                         xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.SetMovieDetails", "params": { "movieid": %i, "art": { "%s": "%s" }}, "id": 1 }' %(item['dbid'], item['art_type'], item['url']))
                     elif item['mediatype'] == 'tvshow':
                         xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.SetTVShowDetails", "params": { "tvshowid": %i, "art": { "%s": "%s" }}, "id": 1 }' %(item['dbid'], item['art_type'], item['url']))
+                    elif item['mediatype'] == 'episode':
+                        xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.SetEpisodeDetails", "params": { "episodeid": %i, "art": { "%s": "%s" }}, "id": 1 }' %(item['dbid'], item['art_type'], item['url']))
                 except HTTP404Error, e:
                     log('URL not found: %s' % str(e), xbmc.LOGERROR)
                     download_succes = False
@@ -790,6 +796,9 @@ class Main:
         global startup
         # Look for argument matching artwork types
         for item in sys.argv:
+            if item == 'episode.fanart' and startup['mediatype'] == 'tvshow':
+                log('- Custom tvshow mode art_type: episode fanart')
+                download_arttypes.append('fanart')
             for type in arttype_list:
                 if item == type['art_type'] and startup['mediatype'] == type['media_type']:
                     log('- Custom %s mode art_type: %s' %(type['media_type'],type['art_type']))
@@ -805,7 +814,10 @@ class Main:
                 imagelist = gui_imagelist(image_list, gui_arttype)
             log('- Number of images: %s' %len(imagelist))
             # If more images than 1 found show GUI selection
-            if len(imagelist) > 1:
+            if currentmedia['mediatype'] == 'episode':
+                image_list = [imagelist[0]]
+                self._download_process(currentmedia)
+            elif len(imagelist) > 1:
                 dialog_msg('close',
                            background = setting['background'])
                 startup['mode'] = 'customgui'

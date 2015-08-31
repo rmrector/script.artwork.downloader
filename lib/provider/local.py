@@ -47,7 +47,7 @@ class local():
         i = 0 # needed
         j = 0 # have
         for item in arttype_list:
-            if item['bulk_enabled'] and media_item['mediatype'] == item['media_type']:
+            if (item['bulk_enabled'] or item['solo_enabled']) and media_item['mediatype'] == item['media_type']:
                 #log('finding: %s, arttype counter: %s'%(item['art_type'], i))
                 i += 1
                 # File checking
@@ -64,7 +64,6 @@ class local():
                         generalinfo += '%s: %s  |  ' % (__localize__(32145), 'n/a')
                         for filename in extrafanart_file_list:
                             url = os.path.join(media_item['extrafanartdirs'][0], filename).encode('utf-8')
-                            rlog(url)
                             item = {
                                 'url': url,
                                 'preview': url,
@@ -178,6 +177,25 @@ class local():
                         else:
                             missing.append(filename)
 
+                elif item['media_type'] == 'episode' and item['art_type'] == 'fanart':
+                    filename = item['filename'] % basename(media_item['file'])
+                    if filename in file_list:
+                        url = os.path.join(media_item['artworkdir'][0], filename).encode('utf-8')
+                        j += 1
+                        generalinfo = '%s: %s  |  ' %( __localize__(32141), 'n/a')
+                        generalinfo += '%s: %s  |  ' %( __localize__(32143), 'n/a')
+                        generalinfo += '%s: %s  |  ' %( __localize__(32145), 'n/a')
+                        # Fill list
+                        #log ('found: %s'%url)
+                        image_list.append({'url': url,
+                                           'preview': url,
+                                           'id': filename,
+                                           'art_type': [item['art_type']],
+                                           'size': '0',
+                                           'season': 'n/a',
+                                           'language': 'EN',
+                                           'votes': '0',
+                                           'generalinfo': generalinfo})
                 else:
                     filename = item['filename']
                     #log ('finding: %s'%filename)

@@ -78,7 +78,7 @@ def arttype_list():
                            'gui_string': 32130,
                            'art_type': 'landscape',
                            'filename': 'landscape.jpg'},
-                          
+
                           {'media_type': 'movie',
                            'bulk_enabled': setting.get('movie_banner'),
                            'solo_enabled': 'true',
@@ -212,5 +212,12 @@ def arttype_list():
                            'solo_enabled': 'true',
                            'gui_string': 32132,
                            'art_type': 'cdart',
-                           'filename': 'disc.png'}]
+                           'filename': 'disc.png'},
+
+                           {'media_type': 'episode',
+                            'bulk_enabled': 'false',
+                            'solo_enabled': 'true',
+                            'gui_string': 32121,
+                            'art_type': 'fanart',
+                            'filename': '%s-fanart.jpg'}]
     return available_arttypes
