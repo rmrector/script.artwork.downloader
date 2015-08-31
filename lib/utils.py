@@ -48,6 +48,7 @@ __addon__        = lib.common.__addon__
 __localize__     = lib.common.__localize__
 __addonname__    = lib.common.__addonname__
 __icon__         = lib.common.__icon__
+__addonid__ = lib.common.__addonid__
 
 cache = StorageServer.StorageServer("ArtworkDownloader",240)
 
@@ -80,8 +81,10 @@ def log(txt, severity=xbmc.LOGDEBUG):
     if severity == xbmc.LOGDEBUG and not __addon__.getSetting("debug_enabled") == 'true':
         pass
     else:
+        if severity < xbmc.LOGNOTICE:
+            severity = xbmc.LOGNOTICE
         try:
-            message = ('%s: %s' % (__addonname__,txt) )
+            message = ('[%s] %s' % (__addonid__,txt) )
             xbmc.log(msg=message, level=severity)
         except UnicodeEncodeError:
             try:
@@ -208,3 +211,46 @@ def unquoteimage(imagestring):
 
 def basename(path):
     return os.path.splitext(os.path.basename(path))[0]
+
+watch_addon_filter = ['*']
+
+_log_level_tag_lookup = {
+    xbmc.LOGDEBUG: 'D',
+    xbmc.LOGINFO: 'I'
+}
+
+def rlog(message, level=xbmc.LOGDEBUG):
+    if '*' not in watch_addon_filter and __addonid__ not in watch_addon_filter and level < xbmc.LOGNOTICE:
+        return
+
+    if level < xbmc.LOGNOTICE:
+        # Don't want to turn on full Kodi debug logging, so just elevate at the moment
+        level_tag = _log_level_tag_lookup[level] + ': ' if level in _log_level_tag_lookup else ''
+        level = xbmc.LOGNOTICE
+    else:
+        level_tag = ''
+
+    if isinstance(message, (dict, list, tuple)):
+        message = json.dumps(message, skipkeys=True, ensure_ascii=False, indent=2, cls=LogJSONEncoder)
+        if isinstance(message, unicode):
+            message = message.encode('utf-8')
+    elif isinstance(message, unicode):
+        message = message.encode('utf-8')
+    elif not isinstance(message, str):
+        message = str(message)
+
+    #Log to file
+    file_message = '%s[%s] %s' % (level_tag, __addonid__, message)
+    xbmc.log(file_message, level)
+
+class LogJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, tuple):
+            return list(obj)
+        # switch this to isinstance collections.Mapping (make dict) and collections.Iterable (make list)
+        elif hasattr(obj, 'keys'):
+            return dict((key, obj[key]) for key in obj.keys())
+        elif hasattr(obj, '__dict__'):
+            return obj.__dict__
+        else:
+            return str(obj)
