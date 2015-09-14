@@ -446,6 +446,7 @@ class Main:
         imagefound = False                      # Set found image false
         imageignore = False                     # Set ignaore image false
         missingfiles = False
+        skip_first_extrafanart = art_item['art_type'] == 'extrafanart'
         global download_list
         final_image_list = []
         if startup['mode'] in ['gui', 'customgui'] and not art_item['art_type'] in ['extrafanart', 'extrathumbs']:
@@ -541,11 +542,16 @@ class Main:
                                                  pref_language,
                                                  currentmedia['disctype'])
                             else:
-                                limited = filter(art_item['art_type'],
-                                                 startup['mediatype'],
-                                                 item['artwork_details'],
-                                                 limit_counter,
-                                                 pref_language)
+                                # HACK: For now this is a gross hack that only works in some general cases
+                                if skip_first_extrafanart:
+                                    limited = [True, "Leave highest rated image for main 'fanart' image."]
+                                    skip_first_extrafanart = False
+                                else:
+                                    limited = filter(art_item['art_type'],
+                                                     startup['mediatype'],
+                                                     item['artwork_details'],
+                                                     limit_counter,
+                                                     pref_language)
                             # Delete extrafanart when below settings and parsing the reason message
                             if limited[0] and not i == 1 and art_item['art_type'] in ['extrafanart', 'extrathumbs']:
                                 #self.fileops._delete_file_in_dirs(item['filename'], item['targetdirs'], limited[1],currentmedia['name'])
