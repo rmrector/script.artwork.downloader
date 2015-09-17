@@ -67,12 +67,16 @@ class TVDBProvider():
                     # process banners
                     elif image.findtext('BannerType') == 'series' and image.findtext('BannerType2') == 'graphical':
                         info['art_type'] = ['banner']
+                        info['width'] = 758
+                        info['height'] = 140
                     # process seasonposters
                     elif image.findtext('BannerType') == 'season' and image.findtext('BannerType2') == 'season':
                         info['art_type'] = ['seasonposter']
                     # process seasonbanners
                     elif image.findtext('BannerType') == 'season' and image.findtext('BannerType2') == 'seasonwide':
                         info['art_type'] = ['seasonbanner']
+                        info['width'] = 758
+                        info['height'] = 140
                     else:
                         info['art_type'] = ['']
                     # convert image size ...x... in Bannertype2
@@ -105,7 +109,7 @@ class TVDBProvider():
                     if info['season'] != 'n/a':
                         info['generalinfo'] += '%s: %s  |  ' %( __localize__(32144), info['season'] )
                     if 'height' in info:
-                        info['generalinfo'] += '%s: %sx%s  |  ' %( __localize__(32145), info['height'], info['width'] )
+                        info['generalinfo'] += '%s: %sx%s  |  ' %( __localize__(32145), info['width'], info['height'] )
                     info['generalinfo'] += '%s: %s  |  %s: %s  |  ' %( __localize__(32142), ('%.1f' % info['rating']) if info['votes'] else 'n/a', __localize__(32143), info['votes'] )
 
                 if info:

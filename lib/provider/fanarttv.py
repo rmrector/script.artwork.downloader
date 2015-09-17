@@ -88,15 +88,17 @@ class FTV_TVProvider():
                                 size = 'HD'
                             elif art in ['clearlogo', 'clearart']:
                                 size = 'SD'
+                            elif art in ['tvbanner', 'seasonbanner']:
+                                size = '1000x185'
                             else:
                                 size = ''
                             # Create GUI info tag
                             generalinfo = '%s: %s  |  ' %( __localize__(32141), get_language(item.get('lang')).capitalize())
                             if item.get('season'):
                                 generalinfo += '%s: %s  |  ' %( __localize__(32144), item.get('season'))
-                            generalinfo += '%s: %s  |  ' %( __localize__(32143), item.get('likes'))
-                            if art in ['hdtvlogo', 'hdclearart', 'clearlogo', 'clearart']:
+                            if size:
                                 generalinfo += '%s: %s  |  ' %( __localize__(32145), size)
+                            generalinfo += '%s: %s  |  ' %( __localize__(32143), item.get('likes'))
                             # Fill list
                             image_list.append({'url': urllib.quote(item.get('url'), ':/'),
                                                'preview': item.get('url') + '/preview',
