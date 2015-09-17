@@ -54,12 +54,11 @@ class TMDBEpisodeProvider():
 
             image_list = []
             for item in data['stills']:
-                if int(item.get('vote_count')) > 0:
-                    rating = float( "%.1f" % float( item.get('vote_average'))) #output string with one decimal
-                    votes = item.get('vote_count','n/a')
+                votes = int(item.get('vote_count', 0))
+                if votes > 0:
+                    rating = float(item.get('vote_average'))
                 else:
                     rating = 5
-                    votes = 0
                 # Fill list
                 image_list.append({'url': baseurl + 'original' + item['file_path'],
                                    'preview': baseurl + 'w300' + item['file_path'],
@@ -73,7 +72,7 @@ class TMDBEpisodeProvider():
                                    # Create Gui string to display
                                    'generalinfo': ('%s: %s  |  %s: %s  |  %s: %s  |  %s: %sx%s  |  '
                                                    %( __localize__(32141), get_language(item.get('iso_639_1','n/a')).capitalize(),
-                                                      __localize__(32142), rating if votes else 'n/a',
+                                                      __localize__(32142), ('%.1f' % rating) if votes else 'n/a',
                                                       __localize__(32143), votes,
                                                       __localize__(32145), item.get('width'), item.get('height')))})
             if not image_list:
@@ -105,12 +104,12 @@ class TMDBProvider():
             # Get fanart
             try:
                 for item in data['backdrops']:
-                    if int(item.get('vote_count')) >= 1:
-                        rating = float( "%.1f" % float( item.get('vote_average'))) #output string with one decimal
-                        votes = item.get('vote_count','n/a')
+                    votes = int(item.get('vote_count', 0))
+                    if votes > 0:
+                        rating = float(item.get('vote_average'))
                     else:
-                        rating = 'n/a'
-                        votes = 'n/a'
+                        rating = 5
+
                     image_list.append({'url': BASE_IMAGEURL + 'original' + item['file_path'],
                                        'preview': BASE_IMAGEURL + 'w300' + item['file_path'],
                                        'id': item.get('file_path').lstrip('/').replace('.jpg', ''),
@@ -123,7 +122,7 @@ class TMDBProvider():
                                        # Create Gui string to display
                                        'generalinfo': ('%s: %s  |  %s: %s  |  %s: %s  |  %s: %sx%s  |  '
                                                        %( __localize__(32141), get_language(item.get('iso_639_1','n/a')).capitalize(),
-                                                          __localize__(32142), rating,
+                                                          __localize__(32142), ('%.1f' % rating) if votes else 'n/a',
                                                           __localize__(32143), votes,
                                                           __localize__(32145), item.get('width'), item.get('height')))})
             except Exception, e:
@@ -131,12 +130,12 @@ class TMDBProvider():
             # Get thumbs
             try:
                 for item in data['backdrops']:
-                    if int(item.get('vote_count')) >= 1:
-                        rating = float( "%.1f" % float( item.get('vote_average'))) #output string with one decimal
-                        votes = item.get('vote_count','n/a')
+                    votes = int(item.get('vote_count', 0))
+                    if votes > 0:
+                        rating = float(item.get('vote_average')) #output string with one decimal
                     else:
-                        rating = 'n/a'
-                        votes = 'n/a'
+                        rating = 5
+
                     # Fill list
                     image_list.append({'url': BASE_IMAGEURL + 'w780' + item['file_path'],
                                        'preview': BASE_IMAGEURL + 'w300' + item['file_path'],
@@ -150,7 +149,7 @@ class TMDBProvider():
                                        # Create Gui string to display
                                        'generalinfo': ('%s: %s  |  %s: %s  |  %s: %s  |  %s: %sx%s  |  '
                                                        %( __localize__(32141), get_language(item.get('iso_639_1','n/a')).capitalize(),
-                                                          __localize__(32142), rating,
+                                                          __localize__(32142), ('%.1f' % rating) if votes else 'n/a',
                                                           __localize__(32143), votes,
                                                           __localize__(32145), item.get('width'), item.get('height')))})
             except Exception, e:
@@ -158,12 +157,11 @@ class TMDBProvider():
             # Get posters
             try:
                 for item in data['posters']:
-                    if int(item.get('vote_count')) >= 1:
-                        rating = float( "%.1f" % float( item.get('vote_average'))) #output string with one decimal
-                        votes = item.get('vote_count','n/a')
+                    votes = int(item.get('vote_count', 0))
+                    if votes > 0:
+                        rating = float(item.get('vote_average'))
                     else:
-                        rating = 'n/a'
-                        votes = 'n/a'
+                        rating = 5
                     # Fill list
                     image_list.append({'url': BASE_IMAGEURL + 'original' + item['file_path'],
                                        'preview': BASE_IMAGEURL + 'w185' + item['file_path'],
@@ -177,7 +175,7 @@ class TMDBProvider():
                                        # Create Gui string to display
                                        'generalinfo': ('%s: %s  |  %s: %s  |  %s: %s  |  %s: %sx%s  |  '
                                                        %( __localize__(32141), get_language(item.get('iso_639_1','n/a')).capitalize(),
-                                                          __localize__(32142), rating,
+                                                          __localize__(32142), ('%.1f' % rating) if votes else 'n/a',
                                                           __localize__(32143), votes,
                                                           __localize__(32145), item.get('width'), item.get('height')))})
             except Exception, e:

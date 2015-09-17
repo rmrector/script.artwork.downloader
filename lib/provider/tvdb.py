@@ -40,7 +40,7 @@ class TVDBProvider():
     def __init__(self):
         self.name = 'TVDB'
         self.api_key = '1A41A145E2DA0053'
-        
+
         self.url_prefix = 'http://www.thetvdb.com/banners/'
 
     def get_image_list(self, media_id):
@@ -88,12 +88,11 @@ class TVDBProvider():
                     info['series_name'] = image.findtext('SeriesName') == 'true'
 
                     # find image ratings
-                    if int(image.findtext('RatingCount')) >= 1:
-                        info['rating'] = float( "%.1f" % float( image.findtext('Rating')) ) #output string with one decimal
-                        info['votes'] = image.findtext('RatingCount')
+                    info['votes'] = int(image.findtext('RatingCount'))
+                    if info['votes'] > 0:
+                        info['rating'] = float( image.findtext('Rating'))
                     else:
-                        info['rating'] = 'n/a'
-                        info['votes'] = 'n/a'
+                        info['rating'] = 5
 
                     # find season info
                     if image.findtext('Season'):
@@ -107,7 +106,7 @@ class TVDBProvider():
                         info['generalinfo'] += '%s: %s  |  ' %( __localize__(32144), info['season'] )
                     if 'height' in info:
                         info['generalinfo'] += '%s: %sx%s  |  ' %( __localize__(32145), info['height'], info['width'] )
-                    info['generalinfo'] += '%s: %s  |  %s: %s  |  ' %( __localize__(32142), info['rating'], __localize__(32143), info['votes'] )
+                    info['generalinfo'] += '%s: %s  |  %s: %s  |  ' %( __localize__(32142), ('%.1f' % info['rating']) if info['votes'] else 'n/a', __localize__(32143), info['votes'] )
 
                 if info:
                     image_list.append(info)
