@@ -30,8 +30,8 @@ def get_providers():
     musicvideo_providers = []
     providers = {}
 
-    tv_providers.append(TVDBProvider())
     tv_providers.append(FTV_TVProvider())
+    tv_providers.append(TVDBProvider())
 
     movie_providers.append(TMDBProvider())
     movie_providers.append(FTV_MovieProvider())
