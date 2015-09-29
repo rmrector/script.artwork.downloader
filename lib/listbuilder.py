@@ -1,16 +1,20 @@
 import sys
 import urllib
+import xbmc
 import xbmcgui
 import xbmcplugin
 
 def handle_pluginlist():
     path = get_pluginpath(True)
     if path['path'][0] == 'multiimage':
-        build_list(multiimage(path), path['handle'])
+        if len(path['path']) == 1:
+            build_list(stitch_multiimage(path), path['handle'])
+        elif path['path'][1] == 'listitem':
+            build_list(get_listitem_multiimage(path), path['handle'])
 
-def multiimage(path):
-    """Stitch together a bunch of images for a 'multiimage' control. Feed it as many images as you want, any empty values are safely ignored. Great for multi fanart, like below:
-    plugin://script.artwork.downloader/multiimage/?image=$INFO[Container(9001).ListItem.Art(fanart)]&amp;&amp;image=$INFO[Container(9001).ListItem.Art(fanart1)]&amp;&amp;image=$INFO[Container(9001).ListItem.Art(fanart2)]&amp;&amp;image=$INFO[Container(9001).ListItem.Art(fanart3)]&amp;&amp;image=$INFO[Container(9001).ListItem.Art(fanart4)]&amp;&amp;image=$INFO[Container(9001).ListItem.Art(fanart5)]
+def stitch_multiimage(path):
+    """Stitch together a bunch of images for a 'multiimage' control. Feed it as many images as you want, any empty values are safely ignored. Use when listitem_multifanart doesn't quite work, like so:
+    plugin://script.artwork.downloader/multiimage/?image=<image_path>&amp;&amp;image=<image_path>&amp;&amp;image=<image_path>&amp;&amp;image=<image_path>&amp;&amp;image=<image_path>&amp;&amp;image=<image_path>
     """
     if 'image' not in path['query'] or not path['query']['image']:
         return []
@@ -18,6 +22,38 @@ def multiimage(path):
         return [unquoteimage(image) for image in path['query']['image'] if image]
     else:
         return [unquoteimage(path['query']['image'])]
+
+def get_listitem_multiimage(path):
+    """Stitch together all fanart for the selected ListItem:
+    plugin://script.artwork.downloader/multiimage/listitem_multifanart/?refresh=$INFO[ListItem.DBID]&amp;&amp;containerid=4250&amp;&amp;arttype=tvshow.fanart
+
+    'refresh' is just to get Kodi to fire off the plugin again, just set it to something that will change when the fanart should change
+    'containerid' is optional, and points to an alternate container
+    'arttype' is optional, and lets you select different artwork
+    """
+
+    if 'containerid' in path['query']:
+        infolabel = 'Container(%s).ListItem.Art(%s%s)' % (path['query']['containerid'], path['query'].get('arttype', 'fanart'), '%s')
+    else:
+        infolabel = 'ListItem.Art(%s%s)' % (path['query'].get('arttype', 'fanart'), '%s')
+
+    inforesult = xbmc.getInfoLabel(infolabel % '')
+    if inforesult:
+        result = [unquoteimage(inforesult)]
+    else:
+        return []
+    lastempty = False
+    for i in range(1, path['query'].get('limit', 100)):
+        inforesult = xbmc.getInfoLabel(infolabel % i)
+        if inforesult:
+            result.append(unquoteimage(inforesult))
+            lastempty = False
+        else:
+            if lastempty:
+                break
+            lastempty = True
+
+    return result
 
 def get_pluginpath(doublequerysplit=False):
     """Split path into a handy dict.
